@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Trireme Factor Lens
 Factor analysis and market regime visualization.
 
@@ -53,3 +54,6 @@ trireme-factor-lens/
 ├── vite.config.ts
 └── package.json
 \`\`\`
+=======
+# Trireme-Factor-Lens
+>>>>>>> 2557a3d087074eed2eb44cacb49839fdf1ed80d3
