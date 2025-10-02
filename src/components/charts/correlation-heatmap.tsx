@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Plot from "react-plotly.js"
 import type { Data, Layout } from "plotly.js"
-import { parseCSV } from "../../lib/csv-parser"
+import { getCorrelation } from "../../lib/api-client"
 
 interface CorrelationHeatmapProps {
   isDarkMode?: boolean
@@ -22,69 +22,22 @@ export function CorrelationHeatmap({ isDarkMode = false }: CorrelationHeatmapPro
   const loadData = async () => {
     try {
       setIsLoading(true)
-      const csvData = await parseCSV("/data/factors_data.csv")
+      const correlationData = await getCorrelation()
 
-      if (csvData.data.length === 0) {
+      if (!correlationData.factors || correlationData.factors.length === 0) {
         setError("No data available")
         return
       }
 
-      const factors = csvData.headers.filter((h) => h.toLowerCase() !== "date")
-      setFactorNames(factors)
-
-      const matrix = calculateCorrelationMatrix(csvData.data, factors)
-      setCorrelationMatrix(matrix)
+      setFactorNames(correlationData.factors)
+      setCorrelationMatrix(correlationData.correlation_matrix)
 
       setIsLoading(false)
     } catch (err) {
       console.error("Error loading correlation data:", err)
-      setError("Failed to load data. Please ensure factors_data.csv is in the /public/data folder.")
+      setError("Failed to load data from API. Please check your connection.")
       setIsLoading(false)
     }
-  }
-
-  const calculateCorrelationMatrix = (data: any[], factors: string[]): number[][] => {
-    const n = factors.length
-    const matrix: number[][] = Array(n)
-      .fill(0)
-      .map(() => Array(n).fill(0))
-
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < n; j++) {
-        if (i === j) {
-          matrix[i][j] = 1
-        } else {
-          const values1 = data.map((row) => row[factors[i]]).filter((v) => v !== null && !isNaN(v))
-          const values2 = data.map((row) => row[factors[j]]).filter((v) => v !== null && !isNaN(v))
-          matrix[i][j] = pearsonCorrelation(values1, values2)
-        }
-      }
-    }
-
-    return matrix
-  }
-
-  const pearsonCorrelation = (x: number[], y: number[]): number => {
-    const n = Math.min(x.length, y.length)
-    if (n === 0) return 0
-
-    const meanX = x.reduce((a, b) => a + b, 0) / n
-    const meanY = y.reduce((a, b) => a + b, 0) / n
-
-    let numerator = 0
-    let denomX = 0
-    let denomY = 0
-
-    for (let i = 0; i < n; i++) {
-      const dx = x[i] - meanX
-      const dy = y[i] - meanY
-      numerator += dx * dy
-      denomX += dx * dx
-      denomY += dy * dy
-    }
-
-    if (denomX === 0 || denomY === 0) return 0
-    return numerator / Math.sqrt(denomX * denomY)
   }
 
   const plotData: Partial<Data>[] = [
