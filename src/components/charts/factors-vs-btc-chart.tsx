@@ -28,7 +28,7 @@ export function FactorsVsBTCChart({ isDarkMode = false }: FactorsVsBTCChartProps
   const [factors, setFactors] = useState<string[]>([])
   const [selectedFactors, setSelectedFactors] = useState<Set<string>>(new Set())
   const [showBTC, setShowBTC] = useState(true)
-  const [selectedTimeframe, setSelectedTimeframe] = useState("all") // Set default timeframe to "all" instead of "1m"
+  const [selectedTimeframe, setSelectedTimeframe] = useState("all")
   const [startDate, setStartDate] = useState<string>("")
   const [endDate, setEndDate] = useState<string>("")
   const [manualDateOverride, setManualDateOverride] = useState(false)
@@ -120,14 +120,6 @@ export function FactorsVsBTCChart({ isDarkMode = false }: FactorsVsBTCChartProps
     })
 
     setData(filtered)
-    console.log(
-      "[v0] Timeframe filtered data:",
-      filtered.length,
-      "records from",
-      filtered[0]?.date,
-      "to",
-      filtered[filtered.length - 1]?.date,
-    )
   }
 
   const filterDataByDates = () => {
@@ -150,14 +142,6 @@ export function FactorsVsBTCChart({ isDarkMode = false }: FactorsVsBTCChartProps
     }
 
     setData(filtered)
-    console.log(
-      "[v0] Date filtered data:",
-      filtered.length,
-      "records from",
-      filtered[0]?.date,
-      "to",
-      filtered[filtered.length - 1]?.date,
-    )
   }
 
   const toggleFactor = (factor: string) => {
@@ -226,7 +210,7 @@ export function FactorsVsBTCChart({ isDarkMode = false }: FactorsVsBTCChartProps
     autosize: true,
     height: 600,
     margin: { l: 60, r: 60, t: 40, b: 140 },
-    title: "Factor Cumulative Returns with BTC",
+    title: "Factor vs BTC",
     paper_bgcolor: isDarkMode ? "rgba(24, 26, 32, 0)" : "rgba(255, 255, 255, 0)",
     plot_bgcolor: isDarkMode ? "rgba(24, 26, 32, 0)" : "rgba(255, 255, 255, 0)",
     font: { color: isDarkMode ? "#e5e7eb" : "#1f2937", size: 12 },
@@ -268,8 +252,8 @@ export function FactorsVsBTCChart({ isDarkMode = false }: FactorsVsBTCChartProps
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-4 items-center">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap gap-2 sm:gap-4 items-center">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <Label htmlFor="start-date" className="text-sm whitespace-nowrap">
             Start Date:
           </Label>
@@ -278,13 +262,13 @@ export function FactorsVsBTCChart({ isDarkMode = false }: FactorsVsBTCChartProps
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="w-40"
+            className="flex-1 sm:w-40"
             min="2022-01-01"
             max="2025-12-31"
             placeholder="dd/mm/yy"
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <Label htmlFor="end-date" className="text-sm whitespace-nowrap">
             End Date:
           </Label>
@@ -293,18 +277,20 @@ export function FactorsVsBTCChart({ isDarkMode = false }: FactorsVsBTCChartProps
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="w-40"
+            className="flex-1 sm:w-40"
             min="2022-01-01"
             max="2025-12-31"
             placeholder="dd/mm/yy"
           />
         </div>
-        <Button onClick={applyDateFilter} size="icon" variant="default">
-          <Search className="h-4 w-4" />
-        </Button>
-        <Button onClick={resetFilters} size="icon" variant="outline" title="Reset filters">
-          <RotateCcw className="h-4 w-4" />
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={applyDateFilter} size="icon" variant="default">
+            <Search className="h-4 w-4" />
+          </Button>
+          <Button onClick={resetFilters} size="icon" variant="outline" title="Reset filters">
+            <RotateCcw className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <Tabs value={selectedTimeframe} onValueChange={handleTimeframeChange} className="w-full">

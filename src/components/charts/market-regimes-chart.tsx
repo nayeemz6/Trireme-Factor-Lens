@@ -69,7 +69,7 @@ export function MarketRegimesChart({ isDarkMode = false, onRegimeDataChange }: M
       setK(newK)
       await loadData(newK)
     } catch (err) {
-      console.error("[v0] Error rebuilding regimes:", err)
+      console.error("Error rebuilding regimes:", err)
       setError("Failed to rebuild regimes. Please try again.")
     } finally {
       setIsRebuilding(false)
@@ -217,8 +217,8 @@ export function MarketRegimesChart({ isDarkMode = false, onRegimeDataChange }: M
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-6 p-4 bg-muted/50 rounded-lg">
-        <div className="space-y-2">
+      <div className="flex flex-wrap gap-4 sm:gap-6 p-3 sm:p-4 bg-muted/50 rounded-lg">
+        <div className="space-y-2 w-full sm:w-auto">
           <Label className="font-semibold">Number of Regimes (K)</Label>
           <div className="flex items-center gap-2">
             <Select
@@ -226,7 +226,7 @@ export function MarketRegimesChart({ isDarkMode = false, onRegimeDataChange }: M
               onValueChange={(value) => handleKChange(Number.parseInt(value))}
               disabled={isRebuilding}
             >
-              <SelectTrigger className="w-[120px]">
+              <SelectTrigger className="w-full sm:w-[120px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -269,34 +269,36 @@ export function MarketRegimesChart({ isDarkMode = false, onRegimeDataChange }: M
           </div>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 w-full sm:w-auto">
           <Label>Date Range</Label>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-[150px]"
+              className="w-full sm:w-[150px]"
               placeholder="dd/mm/yy"
               min="2022-01-01"
               max="2025-12-31"
             />
-            <span className="text-sm text-muted-foreground">to</span>
+            <span className="text-sm text-muted-foreground hidden sm:inline">to</span>
             <Input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-[150px]"
+              className="w-full sm:w-[150px]"
               placeholder="dd/mm/yy"
               min="2022-01-01"
               max="2025-12-31"
             />
-            <Button onClick={applyDateFilter} size="icon" variant="outline">
-              <Search className="h-4 w-4" />
-            </Button>
-            <Button onClick={resetDateFilter} size="icon" variant="outline" title="Reset date range">
-              <RotateCcw className="h-4 w-4" />
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={applyDateFilter} size="icon" variant="default">
+                <Search className="h-4 w-4" />
+              </Button>
+              <Button onClick={resetDateFilter} size="icon" variant="outline" title="Reset date range">
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
