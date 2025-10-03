@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Trireme Factor Lens
 Factor analysis and market regime visualization.
 
@@ -30,30 +29,3 @@ The default password is `trireme2024`. To change it, edit the `correctPassword` 
 - **Charts**: Plotly.js
 - **Data Parsing**: PapaParse
 - **UI Components**: Radix UI primitives
-
-## Project Structure
-
-\`\`\`
-trireme-factor-lens/
-├── public/
-│   └── data/              # CSV data files
-├── src/
-│   ├── components/
-│   │   ├── charts/        # Chart components
-│   │   ├── ui/            # UI primitives
-│   │   ├── dashboard.tsx
-│   │   ├── login-modal.tsx
-│   │   └── theme-toggle.tsx
-│   ├── lib/
-│   │   ├── csv-parser.ts  # CSV parsing utilities
-│   │   └── utils.ts       # Helper functions
-│   ├── App.tsx            # Main app component
-│   ├── main.tsx           # Entry point
-│   └── index.css          # Global styles
-├── index.html
-├── vite.config.ts
-└── package.json
-\`\`\`
-=======
-# Trireme-Factor-Lens
->>>>>>> 2557a3d087074eed2eb44cacb49839fdf1ed80d3

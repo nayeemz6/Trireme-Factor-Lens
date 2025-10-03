@@ -36,31 +36,28 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Top Row: Factors vs BTC and Correlation Heatmap */}
-      <div className="grid grid-cols-1 gap-6">
-        <Card className="xl:col-span-1">
-          <CardHeader>
-            <CardTitle>Factor vs BTC Price</CardTitle>
-            <CardDescription>
-              Compare individual factor values against BTC price movement
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <FactorsVsBTCChart isDarkMode={isDarkMode} />
-          </CardContent>
-        </Card>
+    <div className="w-full space-y-6 p-6">
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Factor vs BTC Price</CardTitle>
+          <CardDescription>
+            Compare individual factor values against BTC price movement
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="min-h-[500px]">
+          <FactorsVsBTCChart isDarkMode={isDarkMode} />
+        </CardContent>
+      </Card>
 
-        <Card className="xl:col-span-1">
-          <CardHeader>
-            <CardTitle>Factor Correlation Heatmap</CardTitle>
-            <CardDescription>Correlation between factors</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <CorrelationHeatmap isDarkMode={isDarkMode} />
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Factor Correlation Heatmap</CardTitle>
+          <CardDescription>Correlation between factors</CardDescription>
+        </CardHeader>
+        <CardContent className="min-h-[500px]">
+          <CorrelationHeatmap isDarkMode={isDarkMode} />
+        </CardContent>
+      </Card>
 
       {/* Market Regimes Section */}
       <Card>
@@ -68,7 +65,7 @@ export default function Dashboard() {
           <CardTitle>Market Regimes (GMM)</CardTitle>
           <CardDescription>Gaussian Mixture Model regime classification with BTC price overlay</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="min-h-[600px]">
           <MarketRegimesChart isDarkMode={isDarkMode} onRegimeDataChange={handleRegimeDataChange} />
         </CardContent>
       </Card>
@@ -77,9 +74,9 @@ export default function Dashboard() {
       <Card>
         <CardHeader>
           <CardTitle>Market Regime Probabilities</CardTitle>
-          <CardDescription>Probability distribution across regimes over time</CardDescription>
+          <CardDescription>Stacked probability distribution across regimes over time</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="min-h-[800px]">
           <RegimeProbabilitiesChart data={regimeData} k={regimeK} isDarkMode={isDarkMode} />
         </CardContent>
       </Card>

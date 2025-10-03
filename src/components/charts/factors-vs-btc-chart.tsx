@@ -8,7 +8,7 @@ import { Checkbox } from "../ui/checkbox"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
-import { Search } from "lucide-react"
+import { Search, RotateCcw } from "lucide-react"
 
 interface FactorsVsBTCChartProps {
   isDarkMode?: boolean
@@ -28,7 +28,7 @@ export function FactorsVsBTCChart({ isDarkMode = false }: FactorsVsBTCChartProps
   const [factors, setFactors] = useState<string[]>([])
   const [selectedFactors, setSelectedFactors] = useState<Set<string>>(new Set())
   const [showBTC, setShowBTC] = useState(true)
-  const [selectedTimeframe, setSelectedTimeframe] = useState("1m")
+  const [selectedTimeframe, setSelectedTimeframe] = useState("all") // Set default timeframe to "all" instead of "1m"
   const [startDate, setStartDate] = useState<string>("")
   const [endDate, setEndDate] = useState<string>("")
   const [manualDateOverride, setManualDateOverride] = useState(false)
@@ -66,7 +66,8 @@ export function FactorsVsBTCChart({ isDarkMode = false }: FactorsVsBTCChartProps
       }
 
       const factorNames = Object.keys(apiData[0]).filter(
-        (key) => key.toLowerCase() !== "date" && !key.toLowerCase().includes("btc_price"),
+        (key) =>
+          key.toLowerCase() !== "date" && !key.toLowerCase().includes("btc") && !key.toLowerCase().includes("bitcoin"),
       )
       setFactors(factorNames)
 
@@ -182,6 +183,13 @@ export function FactorsVsBTCChart({ isDarkMode = false }: FactorsVsBTCChartProps
     filterDataByDates()
   }
 
+  const resetFilters = () => {
+    setStartDate("")
+    setEndDate("")
+    setManualDateOverride(false)
+    setSelectedTimeframe("all")
+  }
+
   const handleTimeframeChange = (value: string) => {
     setSelectedTimeframe(value)
     setManualDateOverride(false)
@@ -202,24 +210,23 @@ export function FactorsVsBTCChart({ isDarkMode = false }: FactorsVsBTCChartProps
     const btcKey = Object.keys(data[0]).find((key) => key.toLowerCase().includes("btc_price"))
     if (btcKey) {
       const btcValues = data.map((row) => row[btcKey])
-      const btcNorm = btcValues.map((v) => v / btcValues[0])
       plotData.push({
         x: data.map((row) => row.date || row.Date),
-        y: btcNorm,
+        y: btcValues,
         type: "scatter" as const,
         mode: "lines" as const,
         name: "BTC",
-      line: { color: "#9ca3af", dash: "dot", width: 2 } as any,
-
-      })
+        line: { color: "#9ca3af", dash: "dot", width: 2 },
+        yaxis: "y2" as const,
+      } as any)
     }
   }
 
   const layout = {
     autosize: true,
     height: 600,
-    margin: { l: 60, r: 60, t: 40, b: 40 },
-    title: "Factor vs BTC",
+    margin: { l: 60, r: 60, t: 40, b: 140 },
+    title: "Factor Cumulative Returns with BTC",
     paper_bgcolor: isDarkMode ? "rgba(24, 26, 32, 0)" : "rgba(255, 255, 255, 0)",
     plot_bgcolor: isDarkMode ? "rgba(24, 26, 32, 0)" : "rgba(255, 255, 255, 0)",
     font: { color: isDarkMode ? "#e5e7eb" : "#1f2937", size: 12 },
@@ -231,12 +238,21 @@ export function FactorsVsBTCChart({ isDarkMode = false }: FactorsVsBTCChartProps
       rangeslider: { visible: true },
     },
     yaxis: {
-      title: "Cumulative Sum",
+      title: "Cumulative Growth",
       side: "left" as const,
       showgrid: true,
       zeroline: false,
+      gridcolor: isDarkMode ? "rgba(75, 85, 99, 0.3)" : "rgba(209, 213, 219, 0.5)",
     },
-    legend: { orientation: "h" as const, y: -0.2, x: 0, xanchor: "left" as const },
+    yaxis2: {
+      title: "BTC Price (USD)",
+      side: "right" as const,
+      overlaying: "y" as const,
+      type: "log" as const,
+      showgrid: false,
+      zeroline: false,
+    },
+    legend: { orientation: "h" as const, y: -0.35, x: 0, xanchor: "left" as const },
     hovermode: "x unified" as const,
   }
 
@@ -263,6 +279,9 @@ export function FactorsVsBTCChart({ isDarkMode = false }: FactorsVsBTCChartProps
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
             className="w-40"
+            min="2022-01-01"
+            max="2025-12-31"
+            placeholder="dd/mm/yy"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -275,10 +294,16 @@ export function FactorsVsBTCChart({ isDarkMode = false }: FactorsVsBTCChartProps
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
             className="w-40"
+            min="2022-01-01"
+            max="2025-12-31"
+            placeholder="dd/mm/yy"
           />
         </div>
         <Button onClick={applyDateFilter} size="icon" variant="default">
           <Search className="h-4 w-4" />
+        </Button>
+        <Button onClick={resetFilters} size="icon" variant="outline" title="Reset filters">
+          <RotateCcw className="h-4 w-4" />
         </Button>
       </div>
 
@@ -299,18 +324,24 @@ export function FactorsVsBTCChart({ isDarkMode = false }: FactorsVsBTCChartProps
             BTC
           </Label>
         </div>
-        {factors.slice(0, 10).map((factor) => (
-          <div key={factor} className="flex items-center space-x-2">
-            <Checkbox
-              id={`factor-${factor}`}
-              checked={selectedFactors.has(factor)}
-              onCheckedChange={() => toggleFactor(factor)}
-            />
-            <Label htmlFor={`factor-${factor}`} className="text-sm cursor-pointer">
-              {factor}
-            </Label>
-          </div>
-        ))}
+        {factors
+          .filter((f) => {
+            const lower = f.toLowerCase()
+            return !lower.includes("btc") && !lower.includes("bitcoin")
+          })
+          .slice(0, 10)
+          .map((factor) => (
+            <div key={factor} className="flex items-center space-x-2">
+              <Checkbox
+                id={`factor-${factor}`}
+                checked={selectedFactors.has(factor)}
+                onCheckedChange={() => toggleFactor(factor)}
+              />
+              <Label htmlFor={`factor-${factor}`} className="text-sm cursor-pointer">
+                {factor}
+              </Label>
+            </div>
+          ))}
       </div>
 
       <div className="w-full">
